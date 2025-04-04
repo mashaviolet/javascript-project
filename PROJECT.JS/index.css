@@ -1,0 +1,68 @@
+
+ .button {
+    background-color:rgb(10, 87, 10) ;
+    font-weight: bold;
+    font-style: normal;
+    margin-left: 1000px ;
+    border-radius: 40px;
+    padding: 5px 10px;
+    color: white;
+    font-size: medium;
+    
+}
+.searchbar {
+    margin-left: 400px;
+    width: 35%;
+    padding: 10px;  
+    font-size: 13px;
+    border-radius: 5px;
+    
+    
+}
+.statement{
+    margin-left: 100px;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 90px;
+}
+
+nav a:hover{
+   
+    color: red;
+}
+nav ul {
+    list-style-type: none; ;
+    display: flex;
+    margin-left: 60px;}
+
+    nav ul li {
+    margin-right: 20px; }
+
+    nav ul li a.active:hover{
+        color: red;
+    }
+
+ nav ul li a.active{
+    color: royalblue;
+ }
+
+    nav ul li a {
+        color: rgb(10, 87, 10);
+        text-decoration: none;
+        padding: 0px 5px;
+        font-size: 16px;
+    }
+    .book-card img {
+        height: 200px;
+        object-fit: cover;
+        width: 200px;
+    }
+
+ 
+
+
+    
+    
+
+   
+  
