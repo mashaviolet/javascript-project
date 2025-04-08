@@ -1,95 +1,203 @@
-const books = [
-    { id: 1, title: "Stearling Cinderella", author: "Musiimenta J", genre: "Fairy Tale", status: "Read", favorite: true, image: "cinderella.jpg" },
-    { id: 2, title: "Love Fool", author: "Masha V", genre: "Fairy Tale", status: "Unread", favorite: false, image: "love fool.jpg" },
-    { id: 3, title: "Once Upon A Time", author: "Tophel T", genre: "Fairy Tale", status: "Read", favorite: false, image: "once upon a time.jpg" },
-    { id: 4, title: "The Violet", author: "Farouk M", genre: "Fairy Tale", status: "Read", favorite: false, image: "violet book.jpg" },
-    { id: 5, title: "The Winter Goodess", author: "Kugonza E", genre: "Fairy Tale", status: "Unread", favorite: false, image: "winter goodess.jpg" }
-];
+// References to elements
+const bookForm = document.getElementById("bookForm");
+const bookList = document.getElementById("bookList");
+const favoriteList = document.getElementById("favoriteList");
+const unreadList = document.getElementById("unreadList");
+const readList = document.getElementById("readList");
 
-// Generate book cards
-function createBookCard(book) {
-    return `
-        <div class="col-md-3">
-            <div class="card shadow-sm book-card" data-id="${book.id}">
-                <img src="${book.image}" class="card-img-top" alt="${book.title}">
-                <div class="card-body">
-                    <h3 class="card-title">${book.title}</h3>
-                    <p class="card-text">Author: ${book.author}</p>
-                    <p class="card-text"><small>Genre: ${book.genre}</small></p>
-                    <p class="card-text"><small>Status: ${book.status}</small></p>
-                    <button class="btn btn-sm btn-danger delete-btn">Delete</button>
-                    <button class="btn btn-sm btn-info edit-btn">Edit</button>
-                    <button class="btn btn-sm ${book.favorite ? 'btn-warning' : 'btn-outline-warning'} favorite-btn">
-                        ${book.favorite ? 'Unfavorite' : 'Favorite'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Display books
-function displayBooks() {
-    const bookList = document.getElementById("book-list");
-    bookList.innerHTML = books.map(createBookCard).join("");
-}
-
-// Event delegation for dynamic buttons
 document.addEventListener("DOMContentLoaded", () => {
-    const bookList = document.getElementById("book-list");
-
-    bookList.addEventListener("click", (e) => {
-        const card = e.target.closest(".book-card");
-        const bookId = card?.dataset.id;
-
-        if (e.target.classList.contains("delete-btn")) {
-            handleDelete(bookId);
-        } else if (e.target.classList.contains("edit-btn")) {
-            handleEdit(bookId);
-        } else if (e.target.classList.contains("favorite-btn")) {
-            toggleFavorite(bookId);
-        }
-    });
+  loadBooks();
 });
 
-function handleDelete(bookId) {
-    const modal = document.getElementById("deleteModal");
-    modal.style.display = "block";
+document.getElementById("bookForm").addEventListener("submit", function (event) {
+  event.preventDefault();
 
-    // Confirm deletion
-    document.getElementById("confirmDeleteBtn").onclick = () => {
-        alert(`Book with ID ${bookId} deleted.`);
-        books.splice(books.findIndex((b) => b.id == bookId), 1);
-        modal.style.display = "none";
-        displayBooks(); // Refresh book list
-    };
+  // Get form values
+  const bookId = document.getElementById("bookId").value.trim();
+  const title = document.getElementById("title").value.trim();
+  const author = document.getElementById("author").value.trim();
+  const genre = document.getElementById("genre").value.trim();
+  const status = document.getElementById("status").value;
+  const imageInput = document.getElementById("image");
 
-    // Cancel deletion
-    document.getElementById("cancelDeleteBtn").onclick = () => {
-        modal.style.display = "none";
+  // Validate required values
+  if (!title || !author || !genre) {
+    alert("All fields are required!");
+    return;
+  }
+
+  // Validate image file type
+  const imageFile = imageInput.files[0];
+  if (imageFile) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      saveBook(bookId, title, author, genre, status, reader.result);
     };
+    reader.readAsDataURL(imageFile);
+  } else {
+    saveBook(bookId, title, author, genre, status, "");
+  }
+});
+
+// Function to save a book
+function saveBook(bookId, title, author, genre, status, image) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  if (bookId) {
+    // Update existing book
+    books = books.map(book =>
+      book.id === bookId
+        ? { ...book, title, author, genre, status, image: image || book.image }
+        : book
+    );
+  } else {
+    // Add new book
+    const newBook = {
+      id: crypto.randomUUID(),
+      title,
+      author,
+      genre,
+      status,
+      image,
+      favorite: false, // Default to false
+    };
+    books.push(newBook);
+  }
+
+  // Save to localStorage
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
+
+  // Reset form and close modal
+  document.getElementById("bookForm").reset();
+  document.getElementById("bookId").value = "";
+  const modalElement = document.getElementById("addBookModal");
+  const modalInstance = new bootstrap.Modal(modalElement);
+  modalInstance.hide();
 }
 
-function handleEdit(bookId) {
-    const modal = document.getElementById("editModal");
-    modal.style.display = "block";
+// Open Edit book Modal
+function openEditBookModal(bookId) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+  let book = books.find(b => b.id === bookId);
 
-    // Save changes
-    document.getElementById("saveChangesBtn").onclick = () => {
-        alert(`Edit changes saved for book ID ${bookId}.`);
-        modal.style.display = "none";
-    };
+  if (!book) {
+    console.error("Book not found!");
+    return;
+  }
 
-    // Cancel editing
-    document.getElementById("cancelEditBtn").onclick = () => {
-        modal.style.display = "none";
-    };
+  // Show modal
+  let modalElement = document.getElementById("addBookModal");
+  let modal = new bootstrap.Modal(modalElement);
+  modal.show();
+
+  setTimeout(() => {
+    // Set modal title and button text
+    document.querySelector(".modal-title").innerText = "Edit Book";
+    document.querySelector("button[type='submit']").innerText = "Update Book";
+
+    // Set form values
+    document.getElementById("bookId").value = book.id;
+    document.getElementById("title").value = book.title;
+    document.getElementById("author").value = book.author;
+    document.getElementById("genre").value = book.genre;
+    document.getElementById("status").value = book.status;
+  }, 100);
 }
 
+// Fetch and load books
+function loadBooks() {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  // Clear current book lists
+  bookList.innerHTML = "";
+  favoriteList.innerHTML = "";
+  unreadList.innerHTML = "";
+  readList.innerHTML = "";
+
+  books.forEach((book) => {
+    const bookCard = createBookCard(book);
+
+    // Append to correct tab
+    bookList.appendChild(bookCard);
+    if (book.favorite) favoriteList.appendChild(createBookCard(book));
+    if (book.status === "Unread") unreadList.appendChild(createBookCard(book));
+    else readList.appendChild(createBookCard(book));
+  });
+}
+
+// Toggle favorite status
 function toggleFavorite(bookId) {
-    const book = books.find((b) => b.id == bookId);
-    book.favorite = !book.favorite;
-    displayBooks(); // Refresh book list
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  books = books.map(book => {
+    if (book.id === bookId) {
+      return { ...book, favorite: !book.favorite };
+    }
+    return book;
+  });
+
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
 }
 
-displayBooks(); // Initial display
+// Create book card
+function createBookCard(book) {
+  const card = document.createElement("div");
+  card.className = "col-md-3 mb-3";
+  card.innerHTML = `
+    <div class="card shadow-sm">
+      <img src="${book.image || "cover-placeholder.jpg"}" class="card-img-top" alt="Book Cover">
+      <div class="card-body">
+          <h5 class="card-title">${book.title}</h5>
+          <p class="card-text">Author: ${book.author}</p>
+          <p class="card-text"><small>Genre: ${book.genre}</small></p>
+          <p class="card-text"><small>Status: ${book.status}</small></p>
+          <button class="btn btn-sm btn-success" id="delete-${book.id}">Delete</button>
+          <button class="btn btn-sm btn-info" id="edit-${book.id}">Edit</button>
+          <button class="btn btn-sm ${book.favorite ? "btn-warning" : "btn-outline-warning"}" id="favorite-${book.id}">
+            ${book.favorite ? "Unfavorite" : "Favorite"}
+          </button>
+      </div>
+    </div>
+  `;
+
+  // Reattach event listeners for buttons inside the card
+  card.querySelector(`#delete-${book.id}`).addEventListener("click", () => deleteBook(book.id));
+  card.querySelector(`#edit-${book.id}`).addEventListener("click", () => openEditBookModal(book.id));
+  card.querySelector(`#favorite-${book.id}`).addEventListener("click", () => toggleFavorite(book.id));
+
+  return card;
+}
+
+// Delete Book
+function deleteBook(bookId) {
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+  books = books.filter(book => book.id !== bookId);
+  localStorage.setItem("books", JSON.stringify(books));
+  loadBooks();
+}
+
+// Search Books
+function searchBooks(input) {
+  let query = input.value.toLowerCase().trim();
+  let books = JSON.parse(localStorage.getItem("books")) || [];
+
+  // Filter books based on title or author
+  let filteredBooks = books.filter(book => 
+    book.title.toLowerCase().includes(query) || 
+    book.author.toLowerCase().includes(query)
+  );
+
+  // Clear current list and display filtered books
+  bookList.innerHTML = ""; // Clear current list
+
+  filteredBooks.forEach(book => {
+    bookList.appendChild(createBookCard(book));
+  });
+
+  // Show message if no books are found
+  if (filteredBooks.length === 0) {
+    bookList.innerHTML = `<p class="text-center text-muted">Book Not Found</p>`;
+  }
+}
