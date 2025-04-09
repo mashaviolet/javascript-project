@@ -1,0 +1,44 @@
+ 
+h1 {
+  color: #03123e;
+}
+
+.container {
+  max-width: 900px;
+}
+
+.nav-tabs .nav-link {
+  font-weight: bold;
+}
+
+.nav-tabs .nav-link {
+  color: #033612 !important;
+  font-weight: bold;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: white !important;
+  color: #0a95c6 !important; 
+}
+
+.nav-tabs .nav-link:hover {
+  color:red !important;
+}
+
+.card img {
+  height: 180px;
+  object-fit: cover;
+}
+
+.search-input {
+  max-width: 500px;
+  margin: auto;
+  display: block;
+  border-radius: 30px;
+}
+
+.book-container {
+  margin: auto;
+  width: 80%;
+}
+
