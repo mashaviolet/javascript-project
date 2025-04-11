@@ -179,26 +179,43 @@ function deleteBook(bookId) {
   loadBooks();
 }
 
-// Search Books
 function searchBooks(input) {
   let query = input.value.toLowerCase().trim();
   let books = JSON.parse(localStorage.getItem("books")) || [];
 
-  // Filter books based on title or author
-  let filteredBooks = books.filter(book => 
-    book.title.toLowerCase().includes(query) || 
+  // Step 1: Get the active tab-pane
+  const activePane = document.querySelector(".tab-pane.show.active").id;
+
+  // Step 2: Basic search filter
+  let filteredBooks = books.filter(book =>
+    book.title.toLowerCase().includes(query) ||
     book.author.toLowerCase().includes(query)
   );
 
-  // Clear current list and display filtered books
-  bookList.innerHTML = ""; // Clear current list
+  // Step 3: Further filter based on tab
+  let container;
+  if (activePane === "allBooks") {
+    container = document.getElementById("bookList");
+    // no further filter
+  }  if (activePane === "favorites") {
+    container = document.getElementById("favoriteList");
+    filteredBooks = filteredBooks.filter(book => book.favorite);
+  }  else if (activePane === "unread") {
+    container = document.getElementById("unreadList");
+    filteredBooks = filteredBooks.filter(book => !book.unread);
+  }  else if (activePane === "read") {
+    container = document.getElementById("readList");
+    filteredBooks = filteredBooks.filter(book => !book.read);
+  }
 
-  filteredBooks.forEach(book => {
-    bookList.appendChild(createBookCard(book));
-  });
+  // Step 4: Render results
+  container.innerHTML = "";
 
-  // Show message if no books are found
   if (filteredBooks.length === 0) {
-    bookList.innerHTML = `<p class="text-center text-muted">Book Not Found</p>`;
+    container.innerHTML = `<p class="text-center text-muted">Book Not Found</p>`;
+  } else {
+    filteredBooks.forEach(book => {
+      container.appendChild(createBookCard(book));
+    });
   }
 }
