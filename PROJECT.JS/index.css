@@ -1,45 +1,65 @@
-
-  h2 {
-    color: #03123e;
-  }
-  
-  .container {
-    max-width: 900px;
-  }
-  
-  .nav-tabs .nav-link {
-    font-weight: bold;
-  }
-  
-  .nav-tabs .nav-link {
-    color: #033612 !important;
-    font-weight: bold;
-  }
-  
-  .nav-tabs .nav-link.active {
-    background-color: white !important;
-    color: #0a95c6 !important; 
-  }
-  
-  .nav-tabs .nav-link:hover {
-    color:red !important;
-  }
-  
-  .card img {
-    height: 180px;
-    object-fit: cover;
-  }
-  
-  .search-input {
-    max-width: 500px;
-    margin: auto;
-    display: block;
-    border-radius: 30px;
-  }
-  
-  .book-container {
-    margin: auto;
-    width: 80%;
-  }
  
-  
+h1 {
+  color: #03123e;
+}
+
+.container {
+  max-width: 900px;
+}
+
+.nav-tabs .nav-link {
+  font-weight: bold;
+}
+
+.nav-tabs .nav-link {
+  color: #033612 !important;
+  font-weight: bold;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: white !important;
+  color: #0a95c6 !important; 
+}
+
+.nav-tabs .nav-link:hover {
+  color:red !important;
+}
+
+.card img {
+  height: 180px;
+  object-fit: cover;
+}
+
+.search-input {
+  max-width: 500px;
+  margin: auto;
+  display: block;
+  border-radius: 30px;
+}
+
+.book-container {
+  margin: auto;
+  width: 80%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100vh;
+  background: linear-gradient(135deg, #8a6cec, #38ec5f, #ec5a97, #84eedc, #f07a0c);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+h1 {
+  font-size: 3rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
